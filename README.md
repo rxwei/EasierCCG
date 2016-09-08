@@ -1,0 +1,3 @@
+# EasierCCG
+
+Just easier.
