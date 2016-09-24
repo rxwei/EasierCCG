@@ -8,17 +8,43 @@
 
 import Parsey
 
+let NP: Category = .atom(.nounPhrase)
+
+let marcel: Category = .atom(.nounPhrase)
+/// (S\NP)/NP
+let proved: Category = .functor(.functor(.atom(.sentence),
+                                         .backward,
+                                         .permissive,
+                                         .atom(.nounPhrase)),
+                                .forward,
+                                .permissive,
+                                .atom(.nounPhrase))
+
+var entries = [ "I" : [marcel] ,
+                "Marcel" : [marcel],
+                "disproved" : [proved],
+                "proved" : [proved] ]
+
+var lexicon: CategoryLexicon = CategoryLexicon(entries: entries)
 
 /// For testing purposes
 while true {
-    print("Enter CCG category expression: ")
+    print("Enter a lexicon entry: ")
     do {
-        if let line = readLine(), !line.isEmpty {
-            let cat = try TextGrammar.category.parse(line)
-            print(cat)
+        if let word = readLine(), !word.isEmpty {
+            print("Enter CCG category expression: ")
+            do {
+                if let line = readLine(), !line.isEmpty {
+                    let cat = try TextGrammar.category.parse(line)
+                    print(cat)
+                    lexicon.addEntry(word: word, category: cat)
+                }
+            }
         }
     }
+
     catch let error as ParseFailure {
         print(error)
     }
+    print(lexicon)
 }

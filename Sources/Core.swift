@@ -29,7 +29,6 @@ public enum Category {
             return Feature.harmonic.contains(other)
         }
     }
-    
     case atom(Primitive)
     case variable
     indirect case functor(Category, Direction, Feature, Category)
@@ -43,7 +42,7 @@ extension Category : Equatable {
         case let (.atom(x), .atom(y)):
             return x == y
         case let (.functor(xRes, xDir, xFeat, xArg), .functor(yRes, yDir, yFeat, yArg)):
-            return xRes == yRes || xDir == yDir || xFeat == yFeat || xArg == yArg
+            return xRes == yRes && xDir == yDir && xFeat == yFeat && xArg == yArg
         default:
             return false
         }
@@ -53,7 +52,7 @@ extension Category : Equatable {
 
 /// MARK: - Property predicates
 public extension Category {
-    
+
     public var containsVariable: Bool {
         switch self {
         case .atom(_): return false
@@ -62,7 +61,7 @@ public extension Category {
             return retCat.containsVariable || argCat.containsVariable
         }
     }
-    
+
     public func replacingVariables(with target: Category) -> Category {
         switch self {
         case .atom(_): return self
@@ -74,7 +73,7 @@ public extension Category {
                             argCat.replacingVariables(with: target))
         }
     }
-    
+
 }
 
 private protocol Composable {
@@ -90,16 +89,20 @@ extension Category : Composable {
     
     func compose(with other: Category) -> Category? {
         switch (self, other) {
+        // X/Y Y/Z -> X/Z
         case let (.functor(x, .forward, f1, y), .functor(yy, .forward, f2, z))
             where y == yy && f1.isCompatible(with: f2):
-            return .functor(x, .forward, f2, z)
+            return .functor(x, .forward, f2, z)        
+        // X\Y Y\Z -> X\Z
         case let (.functor(yy, .backward, f1, z), .functor(x, .backward, f2, y))
             where y == yy && f1.isCompatible(with: f2):
             return .functor(x, .backward, f1, z)
+        // X/Y Y\Z -> X\Z
         case let (.functor(x, .forward, .permutationLimiting, y),
                   .functor(yy, .backward, .permutationLimiting, z))
             where y == yy:
             return .functor(x, .backward, .permutationLimiting, z)
+        // X/Y Y\Z -> X\Z
         case let (.functor(yy, .forward, .permutationLimiting, z),
                   .functor(x, .backward, .permutationLimiting, y))
             where y == yy:
@@ -182,7 +185,7 @@ extension Category.Direction : CustomStringConvertible {
 }
 
 extension Category.Feature : CustomStringConvertible {
-    
+
     public var description: String {
         switch self {
         case .applicationOnly:     return "★" /// Star
@@ -192,11 +195,11 @@ extension Category.Feature : CustomStringConvertible {
         case .variable:            return "𝑖" /// Variable
         }
     }
-    
+
 }
 
 extension Category : CustomStringConvertible {
-    
+
     public var description: String {
         switch self {
         case let .atom(p):
@@ -209,3 +212,4 @@ extension Category : CustomStringConvertible {
     }
     
 }
+
