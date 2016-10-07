@@ -10,7 +10,6 @@ import Parsey
 
 let NP: Category = .atom(.nounPhrase)
 
-let marcel: Category = .atom(.nounPhrase)
 /// (S\NP)/NP
 let proved: Category = .functor(.functor(.atom(.sentence),
                                          .backward,
@@ -20,12 +19,12 @@ let proved: Category = .functor(.functor(.atom(.sentence),
                                 .permissive,
                                 .atom(.nounPhrase))
 
-var entries = [ "I" : [marcel] ,
-                "Marcel" : [marcel],
+var entries = [ "I" : [NP] ,
+                "Marcel" : [NP],
                 "disproved" : [proved],
                 "proved" : [proved] ]
 
-var lexicon: CategoryLexicon = CategoryLexicon(entries: entries)
+var lexicon: Lexicon = Lexicon(entries: entries)
 
 /// For testing purposes
 while true {

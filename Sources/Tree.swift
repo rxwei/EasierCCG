@@ -116,13 +116,13 @@ indirect enum ParseTree {
                 if let _ = lcat.raised(toComposeWith: rcat) {
                     let forwardRaised: ParseTree = .node(.raisedLeaf(lcat, neighbor: rcat), right, .forwardCompose)
                     return .node(forwardRaised, right, .forwardCompose)
-                } else {  }
+                } 
             } else {
                 if out.count == 1 {
                     return out[0]
-                } else { }
+                } 
             }
-        } else { }
+        } 
 
         return nil
     }
