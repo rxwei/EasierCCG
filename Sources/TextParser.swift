@@ -17,12 +17,13 @@ enum TextGrammar {
         | Lexer.token("N")  ^^ { _ in Category.atom(.noun) }
         | Lexer.token("V")  ^^ { _ in Category.atom(.verb) }
         | Lexer.token("P")  ^^ { _ in Category.atom(.preposition) }
-        | Lexer.token("S")  ^^ { _ in Category.atom(.sentence) }
+        //| Lexer.token("S")  ^^ { _ in Category.atom(.sentence) }
         | Lexer.token("X")  ^^ { _ in Category.variable }
+        //| "S"  ~~> Lexer.token("[") ~~> Lexer.regex("a-z") ~~> Lexer.token("]") ^^ { _ in Category.atom(.sentence) }
 
     static let slash =
-          Lexer.token("/")  ^^ { _ in { Category.functor($0,  .forward, .permissive, $1) } }
-        | Lexer.token("\\") ^^ { _ in { Category.functor($0, .backward, .permissive, $1) } }
+          Lexer.token("/")  ^^ { _ in { Category.functor($0,  .forward, $1) } }
+        | Lexer.token("\\") ^^ { _ in { Category.functor($0, .backward, $1) } }
 
     static let functorTerm = atom
                            | "(" ~~> functor <~~ ")"

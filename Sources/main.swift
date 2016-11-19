@@ -11,12 +11,10 @@ import Parsey
 let NP: Category = .atom(.nounPhrase)
 
 /// (S\NP)/NP
-let proved: Category = .functor(.functor(.atom(.sentence),
+let proved: Category = .functor(.functor(.atom(.sentence(SentenceFeature.declarativeSentence)),
                                          .backward,
-                                         .permissive,
                                          .atom(.nounPhrase)),
                                 .forward,
-                                .permissive,
                                 .atom(.nounPhrase))
 
 var entries = [ "I" : [NP] ,

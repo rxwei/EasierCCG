@@ -7,14 +7,16 @@
 //
 
 
-protocol LexisLookupable {
+protocol LexiconIndexable {
     associatedtype Category
     subscript(_ key: String) -> [Category] { get set }
 }
+
 struct Lexicon {
     var entries: [String : [Category]]
 }
-extension Lexicon : LexisLookupable {
+
+extension Lexicon : LexiconIndexable {
     subscript(_ key: String) -> [Category] {
         get {
             return entries[key] ?? []
@@ -23,6 +25,7 @@ extension Lexicon : LexisLookupable {
             entries[key] = newValue
         }
     }
+
 
     mutating func addEntry(word: String, category: Category) {
         guard self[word].contains(category) else {
