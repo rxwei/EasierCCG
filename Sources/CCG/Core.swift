@@ -27,6 +27,7 @@ public enum Category {
     public enum Feature {
         case applicationOnly, orderPreserving, permutationLimiting, permissive, variable
 
+        /// Determine if self is harmonic for composition
         var isHarmonic: Bool {
             return self == .permissive || self == .orderPreserving
         }
@@ -37,6 +38,27 @@ public enum Category {
 /// MARK: - Property predicates
 public extension Category {
 
+    /// Determine if self is a type-raised functor
+    public var isTypeRaised: Bool {
+        switch self {
+        case let .forwardFunctor(left, .forwardFunctor(rightLeft, _)),
+             let .backwardFunctor(left, .backwardFunctor(rightLeft, _)),
+             let .forwardFunctor(left, .backwardFunctor(rightLeft, _)),
+             let .backwardFunctor(left, .forwardFunctor(rightLeft, _)):
+            return rightLeft == left
+        default:
+            return false
+        }
+    }
+
+    /// Determine if self is a functor, either forward or backward
+    public var isFunctor: Bool {
+        switch self {
+        case .forwardFunctor(_, _), .backwardFunctor(_, _): return true
+        default: return false
+        }
+    }
+
     /// Determine if the category contains variable
     /// - complexity: O(n), where n is the number of nodes
     public var containsVariable: Bool {
@@ -45,6 +67,13 @@ public extension Category {
         case .variable: return true
         case let .forwardFunctor(retCat, argCat), let .backwardFunctor(retCat, argCat):
             return retCat.containsVariable || argCat.containsVariable
+        }
+    }
+
+    public var isNounOrNP: Bool {
+        switch self {
+        case .atom(.noun), .atom(.nounPhrase): return true
+        default: return false
         }
     }
 
@@ -84,15 +113,17 @@ public extension Category {
         switch (self, other) {
         // X/Y Y/Z -> X/Z
         case let (.forwardFunctor(x, y), .forwardFunctor(yy, z))
-            where y == yy :
+            where y == yy && !x.isNounOrNP:
             return .forwardFunctor(x, z)
         // X\Y Y\Z -> X\Z
         case let (.backwardFunctor(yy, z), .backwardFunctor(x, y))
-            where y == yy :
+            where y == yy && !x.isNounOrNP:
             return .backwardFunctor(x, z)
         // X/Y Y\Z -> X\Z
-        case let (.forwardFunctor(x, y), .backwardFunctor(yy, z)) where y == yy,
-             let (.forwardFunctor(yy, z), .backwardFunctor(x, y)) where y == yy:
+        case let (.forwardFunctor(x, y), .backwardFunctor(yy, z))
+                where y == yy && !x.isNounOrNP,
+             let (.forwardFunctor(yy, z), .backwardFunctor(x, y))
+                where y == yy && !yy.isNounOrNP:
             return .forwardFunctor(x, z)
         default:
             return nil
@@ -109,15 +140,17 @@ public extension Category {
         switch (other, self) {
         // X/Y Y/Z -> X/Z
         case let (.forwardFunctor(x, y), .forwardFunctor(yy, z))
-            where y == yy :
+            where y == yy && !x.isNounOrNP:
             return .forwardFunctor(x, z)
         // X\Y Y\Z -> X\Z
         case let (.backwardFunctor(yy, z), .backwardFunctor(x, y))
-            where y == yy :
+            where y == yy && !yy.isNounOrNP:
             return .backwardFunctor(x, z)
         // X/Y Y\Z -> X\Z
-        case let (.forwardFunctor(x, y), .backwardFunctor(yy, z)) where y == yy,
-             let (.forwardFunctor(yy, z), .backwardFunctor(x, y)) where y == yy:
+        case let (.forwardFunctor(x, y), .backwardFunctor(yy, z))
+                where y == yy && !x.isNounOrNP,
+             let (.forwardFunctor(yy, z), .backwardFunctor(x, y))
+                where y == yy && !yy.isNounOrNP:
             return .forwardFunctor(x, z)
         default:
             return nil

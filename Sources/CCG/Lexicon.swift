@@ -6,7 +6,6 @@
 //
 //
 
-
 public protocol Indexer : Collection {
 
     typealias Index = Int
@@ -77,8 +76,7 @@ public class LexicalEntry<Lex> {
     public let direction: Direction
     public let head: (Category, Lex)
 
-    init(category: Category, direction: Direction,
-         head: (Category, Lex)) {
+    init(category: Category, direction: Direction, head: (Category, Lex)) {
         self.category = category
         self.direction = direction
         self.head = head

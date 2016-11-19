@@ -11,6 +11,8 @@ public enum Rule {
     case backwardApply
     case forwardCompose
     case backwardCompose
+    case forwardCrossCompose
+    case backwardCrossCompose
     case forwardTypeRaise
     case backwardTypeRaise
 }
@@ -22,16 +24,18 @@ extension Rule : CustomStringConvertible {
         case .backwardApply: return "<"
         case .forwardCompose: return ">B"
         case .backwardCompose: return "<B"
+        case .forwardCrossCompose: return ">Bx"
+        case .backwardCrossCompose: return "<Bx"
         case .forwardTypeRaise: return ">T"
         case .backwardTypeRaise: return "<T"
         }
     }
 }
 
-public indirect enum ParseTree {
+public indirect enum SyntaxTree {
 
     case leaf(Category)
-    case node(category: Category, left: ParseTree, right: ParseTree, rule: Rule)
+    case node(category: Category, left: SyntaxTree, right: SyntaxTree, rule: Rule)
 
     public var category: Category {
         switch self {
@@ -40,7 +44,7 @@ public indirect enum ParseTree {
         }
     }
 
-    public var head: ParseTree {
+    public var head: SyntaxTree {
         switch self {
         case let .node(_, left, _, .forwardApply),
              let .node(_, left, _, .forwardCompose):

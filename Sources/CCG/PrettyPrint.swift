@@ -58,40 +58,23 @@ extension SentenceFeature : CustomStringConvertible {
 
     public var description : String {
         switch self {
-        case .declarativeSentence:
-            return "dcl"
-        case .whQuestion:
-            return "wq"
-        case .yesNoQuestion:
-            return "q"
-        case .embeddedQuestion:
-            return "qem"
-        case .embeddedSentence:
-            return "em"
-        case .subjunctiveEmbeddedSentence:
-            return "bem"
-        case .subjunctiveSentence:
-            return "b"
-        case .fragment:
-            return "frg"
-        case .forClause:
-            return "for"
-        case .interjection:
-            return "intj"
-        case .ellipticalInversion:
-            return "inv"
-        case .adjective:
-            return "adj"
-        case .bareInfinitive:
-            return "b"
-        case .toInfinitive:
-            return "to"
-        case .passivePastParticiple:
-            return "pss"
-        case .activePastParticiple:
-            return "pt"
-        case .presentParticiple:
-            return "ng"
+        case .declarativeSentence: return "dcl"
+        case .whQuestion: return "wq"
+        case .yesNoQuestion: return "q"
+        case .embeddedQuestion: return "qem"
+        case .embeddedSentence: return "em"
+        case .subjunctiveEmbeddedSentence: return "bem"
+        case .subjunctiveSentence: return "b"
+        case .fragment: return "frg"
+        case .forClause: return "for"
+        case .interjection: return "intj"
+        case .ellipticalInversion: return "inv"
+        case .adjective: return "adj"
+        case .bareInfinitive: return "b"
+        case .toInfinitive: return "to"
+        case .passivePastParticiple: return "pss"
+        case .activePastParticiple: return "pt"
+        case .presentParticiple: return "ng"
         }
     }
 }
