@@ -192,12 +192,8 @@ public extension Category {
     /// - Parameter direction: direction of type-raising
     /// - Parameter neighbor: neighbor to raise against
     /// - Returns: the resukt of type-raising
-    public func raisedForward(against neighbor: Category) -> Category? {
-        guard case .atom(_) = self,
-            case let .forwardFunctor(.forwardFunctor(x, y), _) = neighbor,
-            self == y
-            else { return nil }
-        return .forwardFunctor(x, .forwardFunctor(x, y))
+    public func raisedForward(against neighbor: Category) -> Category {
+        return raisedForward().replacingVariables(with: neighbor)
     }
 
     /// The result of forward type raising of self against a neighbor
@@ -206,12 +202,8 @@ public extension Category {
     /// - Parameter neighbor: neighbor to raise against
     /// - Precondition: Self is an atom, and neighbor is a corresponding functor
     /// - Returns: the resukt of type-raising
-    public func raisedBackward(against neighbor: Category) -> Category? {
-        guard case .atom(_) = self,
-            case let .backwardFunctor(.backwardFunctor(x, y), _) = neighbor,
-            self == y
-            else { return nil }
-        return .backwardFunctor(x, .backwardFunctor(x, y))
+    public func raisedBackward(against neighbor: Category) -> Category {
+        return raisedBackward().replacingVariables(with: neighbor)
     }
     
 }
