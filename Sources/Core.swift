@@ -272,69 +272,112 @@ extension Category : CustomStringConvertible {
     
 }
 
-public enum SentenceFeature : String, CustomStringConvertible {
+public enum SentenceFeature : CustomStringConvertible {
+
+    public enum ClauseFeature : CustomStringConvertible {
+        case declarativeSentence
+        case whQuestion
+        case yesNoQuestion
+        case embeddedQuestion
+        case embeddedSentence
+        case subjunctiveEmbeddedSentence
+        case subjunctiveSentence
+        case fragment
+        case forClause           // small clauses headed by for [for X to do sth]
+        case interjection
+        case ellipticalInversion // -- (as) [does President Bush]
+
+        public var description : String {
+            switch self {
+                case .declarativeSentence:
+                    return "dcl"
+                case .whQuestion:
+                    return "wq"
+                case .yesNoQuestion:
+                    return "q"
+                case .embeddedQuestion:
+                    return "qem"
+                case .embeddedSentence:
+                    return "em"
+                case .subjunctiveEmbeddedSentence:
+                    return "bem"
+                case .subjunctiveSentence:
+                    return "b"
+                case .fragment:
+                    return "frg"
+                case .forClause:
+                    return "for"
+                case .interjection:
+                    return "intj"
+                case .ellipticalInversion:
+                    return "inv"
+            }
+        }
+    }
+
+    public enum LexiconFeature : CustomStringConvertible {
+        /// attributive adjectives -- S[adj]\NP
+        case adjective
+        /// verb phrase features -- S[b]\NP
+        case bareInfinitive
+        case toInfinitive
+        case passivePastParticiple
+        case activePastParticiple
+        case presentParticiple
+
+        public var description: String {
+            switch self {
+                case .adjective:
+                    return "adj"
+                case .bareInfinitive:
+                    return "b"
+                case .toInfinitive:
+                    return "to"
+                case .passivePastParticiple:
+                    return "pss"
+                case .activePastParticiple:
+                    return "pt"
+                case .presentParticiple:
+                    return "ng"
+            }
+        }
+
+    }
+    
     case none
-    case declarativeSentence
-    case whQuestion
-    case yesNoQuestion
-    case embeddedQuestion
-    case embeddedSentence
-    case subjunctiveEmbeddedSentence
-    case subjunctiveSentence
-    case fragment
-    case forClause           // small clauses headed by for [for X to do sth]
-    case interjection
-    case ellipticalInversion // -- (as) [does President Bush]
-    /// attributive adjectives -- S[adj]\NP
-    case adjective
-    /// verb phrase features -- S[b]\NP
-    case bareInfinitive
-    case toInfinitive
-    case passivePastParticiple
-    case activePastPariticiple
-    case presentParticiple
+    case clause(ClauseFeature)
+    case lexicon(LexiconFeature)
 
     public var description : String {
         switch self {
-        case .none:
-            return ""
-        case .declarativeSentence:
-            return "dcl"
-        case .whQuestion:
-            return "wq"
-        case .yesNoQuestion:
-            return "q"
-        case .embeddedQuestion:
-            return "qem"
-        case .embeddedSentence:
-            return "em"
-        case .subjunctiveEmbeddedSentence:
-            return "bem"
-        case .subjunctiveSentence:
-            return "b"
-        case .fragment:
-            return "frg"
-        case .forClause:
-            return "for"
-        case .interjection:
-            return "intj"
-        case .ellipticalInversion:
-            return "inv"
-        case .adjective:
-            return "adj"
-        case .bareInfinitive:
-            return "b"
-        case .toInfinitive:
-            return "to"
-        case .passivePastParticiple:
-            return "pss"
-        case .activePastPariticiple:
-            return "pt"
-        case .presentParticiple:
-            return "ng"
+            case .none:
+                return ""
+            case let .clause(x):
+                return x.description
+            case let .lexicon(x):
+                return x.description
+
+        }
+    }
+
+}
+
+extension SentenceFeature : Equatable {
+    public static func ==(lhs: SentenceFeature, rhs: SentenceFeature) -> Bool {
+        switch (lhs, rhs) {
+        case let (.clause(x), .clause(y)):
+            return x == y
+        case let (.lexicon(x), .lexicon(y)):
+            return x == y
+        default:
+            return lhs == rhs
         }
     }
 }
+
+
+
+
 
 
 

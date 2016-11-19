@@ -11,7 +11,7 @@ import Parsey
 let NP: Category = .atom(.nounPhrase)
 
 /// (S\NP)/NP
-let proved: Category = .functor(.functor(.atom(.sentence(SentenceFeature.declarativeSentence)),
+let proved: Category = .functor(.functor(.atom(.sentence(SentenceFeature.clause(.declarativeSentence))),
                                          .backward,
                                          .atom(.nounPhrase)),
                                 .forward,
