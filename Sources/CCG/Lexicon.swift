@@ -60,25 +60,23 @@ public extension Indexer {
 
 }
 
-public protocol LexicallyIndexable : Collection {
+public protocol LexicallyIndexable {
     associatedtype Key : Hashable
-    typealias Value = String
-    subscript(_ key: Key) -> Value { get set }
+    associatedtype Lex
+    subscript(key: Key) -> Lex { get set }
 }
 
-public enum Direction {
-    case forward
-    case backward
-}
+public struct Lexicon<Key: Hashable, Lex> : LexicallyIndexable {
 
-public class LexicalEntry<Lex> {
-    public let category: Category
-    public let direction: Direction
-    public let head: (Category, Lex)
+    public var storage: [Key : Lex]
 
-    init(category: Category, direction: Direction, head: (Category, Lex)) {
-        self.category = category
-        self.direction = direction
-        self.head = head
+    public subscript(key: Key) -> Lex? {
+        get {
+            return storage[key]
+        }
+        set {
+            storage[key] = newValue
+        }
     }
+    
 }

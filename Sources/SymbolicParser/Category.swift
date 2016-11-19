@@ -47,7 +47,6 @@ enum ExpressionGrammar {
         | Lexer.token("pt")   ^^ { _ in .activePastParticiple }
         | Lexer.token("ng")   ^^ { _ in .presentParticiple }
 
-    
     static let slash =
           Lexer.token("/")  ^^ { _ in { Category.forwardFunctor($0, $1) } }
         | Lexer.token("\\") ^^ { _ in { Category.backwardFunctor($0, $1) } }

@@ -4,8 +4,19 @@
 /// Created by Richard Wei on 9/14/16.
 ///
 
-/// Combinatory categorial grammar
+/// This file contains the core data structures and rules for 
+/// combinatory categorial grammar
+/// (Steedman, et al. http://groups.inf.ed.ac.uk/ccg/)
 
+/// Primitive (atomic) category parameters
+///
+/// - sentence: S
+/// - noun: N
+/// - preposition: P
+/// - verb: V
+/// - nounPhrase: NP
+/// - prepositionalPhrase: PP
+/// - verbPhrase: VP
 public enum Primitive {
     case sentence(SentenceFeature?), noun, preposition, verb
     case nounPhrase, prepositionalPhrase, verbPhrase
@@ -31,6 +42,11 @@ public enum Category {
         var isHarmonic: Bool {
             return self == .permissive || self == .orderPreserving
         }
+    }
+
+    public enum Direction {
+        case forward
+        case backward
     }
 }
 
