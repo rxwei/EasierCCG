@@ -32,11 +32,18 @@ public enum Category {
             return self == .permissive || self == .orderPreserving
         }
     }
-    
 }
 
 /// MARK: - Property predicates
 public extension Category {
+
+    public var direction: Direction? {
+        switch self {
+        case .backwardFunctor(_, _): return .backward
+        case .forwardFunctor(_, _): return .forward
+        default: return nil
+        }
+    }
 
     /// Determine if self is a type-raised functor
     public var isTypeRaised: Bool {
@@ -59,6 +66,18 @@ public extension Category {
         }
     }
 
+    /// Determine if self is a variable
+    public var isVariable: Bool {
+        if case .variable = self { return true }
+        return false
+    }
+
+    /// Determine if self is an atom
+    public var isAtom: Bool {
+        if case .atom(_) = self { return true }
+        return false
+    }
+
     /// Determine if the category contains variable
     /// - complexity: O(n), where n is the number of nodes
     public var containsVariable: Bool {
@@ -74,6 +93,14 @@ public extension Category {
         switch self {
         case .atom(.noun), .atom(.nounPhrase): return true
         default: return false
+        }
+    }
+
+    public var head: Category {
+        switch self {
+        case .atom(_), .variable: return self
+        case .forwardFunctor(let left, _): return left.head
+        case .backwardFunctor(let left, _): return left.head
         }
     }
 
