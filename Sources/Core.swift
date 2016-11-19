@@ -44,7 +44,7 @@ public enum Category {
     }
     case atom(Primitive)
     case variable
-    indirect case functor(Category, Direction, Category)
+    indirect case functor(Category, Direction, Feature, Category)
     
 }
 
@@ -54,8 +54,8 @@ extension Category : Equatable {
         switch (lhs, rhs) {
         case let (.atom(x), .atom(y)):
             return x == y
-        case let (.functor(xRes, xDir, xArg), .functor(yRes, yDir, yArg)):
-            return xRes == yRes && xDir == yDir && xArg == yArg
+        case let (.functor(xRes, xDir, xFeat, xArg), .functor(yRes, yDir, yFeat, yArg)):
+            return xRes == yRes && xDir == yDir && xFeat == yFeat && xArg == yArg
         default:
             return false
         }
@@ -70,7 +70,7 @@ public extension Category {
         switch self {
         case .atom(_): return false
         case .variable: return true
-        case let .functor(retCat, _, argCat):
+        case let .functor(retCat, _, _, argCat):
             return retCat.containsVariable || argCat.containsVariable
         }
     }
@@ -79,8 +79,9 @@ public extension Category {
         switch self {
         case .atom(_): return self
         case .variable: return target
-        case let .functor(retCat, dir, argCat):
+        case let .functor(retCat, feat, dir, argCat):
             return .functor(retCat.replacingVariables(with: target),
+                            feat,
                             dir,
                             argCat.replacingVariables(with: target))
         }
@@ -102,23 +103,23 @@ extension Category : Composable {
     func compose(with other: Category) -> Category? {
         switch (self, other) {
         // X/Y Y/Z -> X/Z
-        case let (.functor(x, .forward,  y), .functor(yy, .forward,  z))
-            where y == yy :
-            return .functor(x, .forward, z)
+        case let (.functor(x, .forward, f1, y), .functor(yy, .forward, f2, z))
+            where y == yy && f1.isCompatible(with: f2):
+            return .functor(x, .forward, f2, z)        
         // X\Y Y\Z -> X\Z
-        case let (.functor(yy, .backward,  z), .functor(x, .backward,  y))
-            where y == yy :
-            return .functor(x, .backward,  z)
+        case let (.functor(yy, .backward, f1, z), .functor(x, .backward, f2, y))
+            where y == yy && f1.isCompatible(with: f2):
+            return .functor(x, .backward, f1, z)
         // X/Y Y\Z -> X\Z
-        case let (.functor(x, .forward,  y),
-                  .functor(yy, .backward,  z))
+        case let (.functor(x, .forward, .permutationLimiting, y),
+                  .functor(yy, .backward, .permutationLimiting, z))
             where y == yy:
-            return .functor(x, .backward,  z)
+            return .functor(x, .backward, .permutationLimiting, z)
         // X/Y Y\Z -> X\Z
-        case let (.functor(yy, .forward, z),
-                  .functor(x, .backward, y))
+        case let (.functor(yy, .forward, .permutationLimiting, z),
+                  .functor(x, .backward, .permutationLimiting, y))
             where y == yy:
-            return .functor(x, .forward,  z)
+            return .functor(x, .forward, .permutationLimiting, z)
         default:
             return nil
         }
@@ -131,16 +132,18 @@ extension Category : Applicative {
     
     public func apply(to other: Category) -> Category? {
         switch (self, other) {
-        case let (.functor(x, .forward,  y), arg) where arg == y,
-             let (.functor(x, .backward, y), arg) where arg == y:
+        case let (.functor(x, .forward, _, y), arg) where arg == y,
+             let (.functor(x, .backward, _, y), arg) where arg == y:
             return x
         case let (.functor(.functor(.variable,
                                     .backward,
+                                    .applicationOnly,
                                     .variable),
                            .forward,
+                           .applicationOnly,
                            .variable), arg)
             where !arg.containsVariable:
-            return .functor(arg, .backward,  arg)
+            return .functor(arg, .backward, .applicationOnly, arg)
         default:
             return nil
         }
@@ -154,8 +157,18 @@ extension Category {
     func raised(_ direction: Direction) -> Category {
         return .functor(.variable,
                         direction,
-                        .functor(.variable, direction.inverse,  self))
+                        .variable,
+                        .functor(.variable, direction.inverse, .variable, self))
     }
+    
+    func raised(toComposeWith neighbor: Category) -> Category? {
+        guard case .atom(_) = self,
+            case let .functor(.functor(x, direction, feature, y), _, _, _) = neighbor,
+            self == y else { return nil }
+        return .functor(x, .forward, feature, .functor(x, direction, feature, y))
+    }
+    
+
 
     func bareNounRaising() -> Category? {
         switch self {
@@ -172,7 +185,8 @@ extension Category {
         case .atom(.nounPhrase):
             return .functor(.atom(.sentence(.none)),
                             .forward,
-                            .functor(.atom(.sentence(.none)), .backward,  self))
+                            .permissive,
+                            .functor(.atom(.sentence(.none)), .backward, .permissive, self))
         default:
             return .none
         }
@@ -183,10 +197,12 @@ extension Category {
     func NPRaised2() -> Category? {
         switch self {
         case .atom(.nounPhrase):
-            return .functor(.functor(.atom(.sentence(.none)), .backward,  self),
+            return .functor(.functor(.atom(.sentence(.none)), .backward, .permissive, self),
                             .forward,
-                            .functor(.functor(.atom(.sentence(.none)), .backward,  self),
+                            .permissive,
+                            .functor(.functor(.atom(.sentence(.none)), .backward, .permissive, self),
                                      .forward,
+                                     .permissive,
                                      self))
         default:
             return .none
@@ -197,27 +213,22 @@ extension Category {
     func NPRaisedtoPP() -> Category? {
         switch self {
         case .atom(.nounPhrase):
-            return .functor(.functor(.atom(.sentence(.none)), .backward,  self),
+            return .functor(.functor(.atom(.sentence(.none)), .backward, .permissive, self),
                             .forward,
-                            .functor(.functor(.atom(.sentence(.none)), .backward,  self),
+                            .permissive,
+                            .functor(.functor(.atom(.sentence(.none)), .backward, .permissive, self),
                                      .forward,
+                                     .permissive,
                                      .atom(.prepositionalPhrase)))
         default:
             return .none
         }
     }
-
-    func raised(toComposeWith neighbor: Category) -> Category? {
-        guard case .atom(_) = self,
-            case let .functor(.functor(x, direction, y), _,  _) = neighbor,
-            self == y else { return nil }
-        return .functor(x, .forward,  .functor(x, direction, y))
-    }
-    
 }
 
+
 extension Primitive : CustomStringConvertible {
-    
+
     public var description: String {
         switch self {
         case let .sentence(x):     return "S" + x.description
@@ -265,8 +276,9 @@ extension Category : CustomStringConvertible {
             return p.description
         case .variable:
             return "X"
-        case let .functor(result, direction,  argument):
-            return "(\(result) \(direction) \(argument))"
+        case let .functor(result, direction, feature, argument):
+            return "(\(result) \(direction)\(feature) \(argument))"
+
         }
     }
     

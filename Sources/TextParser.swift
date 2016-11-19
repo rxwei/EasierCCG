@@ -19,7 +19,7 @@ enum TextGrammar {
         | Lexer.token("P")  ^^ { _ in Category.atom(.preposition) }
         | Lexer.token("X")  ^^ { _ in Category.variable }
         | Lexer.token("S") ~~> Lexer.token("[") ~~> clauseFeature <~~ Lexer.token("]") ^^ { Category.atom(.sentence(SentenceFeature.clause($0))) }
-        | Lexer.token("S") ~~> Lexer.token("[") ~~> lexiconFeature <~~ Lexer.token("]") ^^ { Category.atom(.sentence(.lexicon($0))) }
+            | Lexer.token("S") ~~> Lexer.token("[") ~~> lexiconFeature <~~ Lexer.token("]") ^^ { Category.atom(.sentence(.lexicon($0))) }
 
 
     static let clauseFeature =
@@ -47,8 +47,9 @@ enum TextGrammar {
 
 
     static let slash =
-          Lexer.token("/")  ^^ { _ in { Category.functor($0,  .forward, $1) } }
-        | Lexer.token("\\") ^^ { _ in { Category.functor($0, .backward, $1) } }
+        Lexer.token("/")  ^^ { _ in { Category.functor($0,  .forward, .permissive, $1) } }
+      | Lexer.token("\\") ^^ { _ in { Category.functor($0, .backward, .permissive, $1) } }
+
 
     static let functorTerm = atom
                            | "(" ~~> functor <~~ ")"
