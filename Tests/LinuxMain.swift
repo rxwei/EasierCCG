@@ -1,6 +1,6 @@
 import XCTest
-@testable import EasierCCGTests
+@testable import CCGTests
 
 XCTMain([
-     testCase(EasierCCGTests.allTests),
+     testCase(CCGTests.allTests),
 ])
