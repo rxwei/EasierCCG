@@ -5,7 +5,7 @@ class SyntaxParserTests: XCTestCase {
 
     func testInitHeap() {
         let elems = [10,5,3,6,4]
-        var mh = MinHeap(elements: elems)
+        var mh = PriorityQueue(elements: elems)
         var out: [Int] = []
         while !mh.isEmpty {
             out.append(mh.removeMin())
@@ -15,7 +15,7 @@ class SyntaxParserTests: XCTestCase {
 
     func testInitHeap2() {
         let elems = [10,5,3,6,4,42]
-        var mh = MinHeap(elements: elems)
+        var mh = PriorityQueue(elements: elems)
         var out: [Int] = []
         while !mh.isEmpty {
             out.append(mh.removeMin())
