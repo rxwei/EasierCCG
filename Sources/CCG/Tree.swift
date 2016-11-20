@@ -32,7 +32,7 @@ extension Rule : CustomStringConvertible {
     }
 }
 
-public indirect enum SyntaxTree {
+public indirect enum SyntaxTree : Equatable{
 
     case leaf(Category)
     case node(category: Category, left: SyntaxTree, right: SyntaxTree, rule: Rule)
@@ -54,6 +54,17 @@ public indirect enum SyntaxTree {
             return right
         default:
             return self
+        }
+    }
+
+    public static func ==(left: SyntaxTree, right: SyntaxTree) -> Bool {
+        switch (left, right) {
+        case let (.leaf(x), .leaf(y)):
+            return x == y
+        case let (.node(cat1, l1, r1, rule1), .node(cat2, l2, r2, rule2)):
+            return cat1 == cat2 && l1 == l2 && r1 == r2 && rule1 == rule2
+        default:
+            return false
         }
     }
 
