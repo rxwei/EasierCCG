@@ -8,9 +8,15 @@
 
 import CCG
 
-public struct Parses {
-    let headWord: String
+public struct Parse {
     let headIndex: Int
-    let score: Double
-    let cat: SyntaxTree
+    let score: Float
+    let root: SyntaxTree
+
 }
+
+//func parseByAStarMumboJumbo(start: Parse, end: Parse) -> [Parse] {
+    //<#function body#>
+//}
+
+
