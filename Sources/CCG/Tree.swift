@@ -32,7 +32,7 @@ extension Rule : CustomStringConvertible {
     }
 }
 
-public indirect enum SyntaxTree : Equatable{
+public indirect enum SyntaxTree : Equatable {
 
     case leaf(Category)
     case node(category: Category, left: SyntaxTree, right: SyntaxTree, rule: Rule)
